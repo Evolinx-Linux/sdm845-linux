@@ -170,32 +170,34 @@
 
 		CPU_PD0: power-domain-cpu0 {
 			#power-domain-cells = <0>;
-			power-domains = <&CLUSTER_PD>;
+			//power-domains = <&CLUSTER_PD>;
 			domain-idle-states = <&CPU_SLEEP>;
 		};
 
 		CPU_PD1: power-domain-cpu1 {
 			#power-domain-cells = <0>;
-			power-domains = <&CLUSTER_PD>;
+			//power-domains = <&CLUSTER_PD>;
 			domain-idle-states = <&CPU_SLEEP>;
 		};
 
 		CPU_PD2: power-domain-cpu2 {
 			#power-domain-cells = <0>;
-			power-domains = <&CLUSTER_PD>;
+			//power-domains = <&CLUSTER_PD>;
 			domain-idle-states = <&CPU_SLEEP>;
 		};
 
 		CPU_PD3: power-domain-cpu3 {
 			#power-domain-cells = <0>;
-			power-domains = <&CLUSTER_PD>;
+			//power-domains = <&CLUSTER_PD>;
 			domain-idle-states = <&CPU_SLEEP>;
 		};
 
+#if 0
 		CLUSTER_PD: power-domain-cpu-cluster {
 			#power-domain-cells = <0>;
 			domain-idle-states = <&CLUSTER_SLEEP>;
 		};
+#endif
 	};
 
 	rpm: remoteproc {

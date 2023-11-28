@@ -182,17 +182,10 @@ static int nt36672a_panel_power_on(struct nt36672a_panel *pinfo)
 	return 0;
 }
 
-static int nt36672a_panel_prepare(struct drm_panel *panel)
+static int nt36672a_panel_enable(struct drm_panel *panel)
 {
 	struct nt36672a_panel *pinfo = to_nt36672a_panel(panel);
 	int err;
-
-	if (pinfo->prepared)
-		return 0;
-
-	err = nt36672a_panel_power_on(pinfo);
-	if (err < 0)
-		goto poweroff;
 
 	/* send first part of init cmds */
 	err = nt36672a_send_cmds(panel, pinfo->desc->on_cmds_1,
@@ -228,6 +221,25 @@ static int nt36672a_panel_prepare(struct drm_panel *panel)
 	}
 
 	msleep(120);
+
+	return 0;
+
+poweroff:
+	gpiod_set_value(pinfo->reset_gpio, 0);
+	return err;
+}
+
+static int nt36672a_panel_prepare(struct drm_panel *panel)
+{
+	struct nt36672a_panel *pinfo = to_nt36672a_panel(panel);
+	int err;
+
+	if (pinfo->prepared)
+		return 0;
+
+	err = nt36672a_panel_power_on(pinfo);
+	if (err < 0)
+		goto poweroff;
 
 	pinfo->prepared = true;
 
@@ -265,6 +277,7 @@ static const struct drm_panel_funcs panel_funcs = {
 	.disable = nt36672a_panel_disable,
 	.unprepare = nt36672a_panel_unprepare,
 	.prepare = nt36672a_panel_prepare,
+	.enable = nt36672a_panel_enable,
 	.get_modes = nt36672a_panel_get_modes,
 };
 

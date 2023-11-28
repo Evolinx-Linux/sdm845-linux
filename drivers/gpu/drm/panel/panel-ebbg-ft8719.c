@@ -112,10 +112,21 @@ static int ebbg_ft8719_disable(struct drm_panel *panel)
 	return 0;
 }
 
+static int ebbg_ft8719_enable(struct drm_panel *panel)
+{
+	struct ebbg_ft8719 *ctx = to_ebbg_ft8719(panel);
+	int ret;
+
+	ret = ebbg_ft8719_on(ctx);
+	if (ret < 0)
+		return ret;
+
+	return 0;
+}
+
 static int ebbg_ft8719_prepare(struct drm_panel *panel)
 {
 	struct ebbg_ft8719 *ctx = to_ebbg_ft8719(panel);
-	struct device *dev = &ctx->dsi->dev;
 	int ret;
 
 	ret = regulator_bulk_enable(ARRAY_SIZE(ctx->supplies), ctx->supplies);
@@ -123,13 +134,6 @@ static int ebbg_ft8719_prepare(struct drm_panel *panel)
 		return ret;
 
 	ebbg_ft8719_reset(ctx);
-
-	ret = ebbg_ft8719_on(ctx);
-	if (ret < 0) {
-		dev_err(dev, "Failed to initialize panel: %d\n", ret);
-		gpiod_set_value_cansleep(ctx->reset_gpio, 1);
-		return ret;
-	}
 
 	return 0;
 }
@@ -183,6 +187,7 @@ static int ebbg_ft8719_get_modes(struct drm_panel *panel,
 
 static const struct drm_panel_funcs ebbg_ft8719_panel_funcs = {
 	.prepare = ebbg_ft8719_prepare,
+	.enable = ebbg_ft8719_enable,
 	.disable = ebbg_ft8719_disable,
 	.unprepare = ebbg_ft8719_unprepare,
 	.get_modes = ebbg_ft8719_get_modes,

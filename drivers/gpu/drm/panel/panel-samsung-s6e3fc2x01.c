@@ -171,6 +171,22 @@ static int samsung_s6e3fc2x01_disable(struct drm_panel *panel)
 	return 0;
 }
 
+static int samsung_s6e3fc2x01_enable(struct drm_panel *panel)
+{
+	struct samsung_s6e3fc2x01 *ctx = to_samsung_s6e3fc2x01(panel);
+	int ret;
+
+	ret = samsung_s6e3fc2x01_on(ctx);
+	if (ret < 0) {
+		dev_err(panel->dev, "Failed to initialize panel: %d\n", ret);
+		gpiod_set_value_cansleep(ctx->reset_gpio, 1);
+		regulator_disable(ctx->supply);
+		return ret;
+	}
+
+	return 0;
+}
+
 static int samsung_s6e3fc2x01_prepare(struct drm_panel *panel)
 {
 	struct samsung_s6e3fc2x01 *ctx = to_samsung_s6e3fc2x01(panel);
@@ -187,14 +203,6 @@ static int samsung_s6e3fc2x01_prepare(struct drm_panel *panel)
 	}
 
 	samsung_s6e3fc2x01_reset(ctx);
-
-	ret = samsung_s6e3fc2x01_on(ctx);
-	if (ret < 0) {
-		dev_err(dev, "Failed to initialize panel: %d\n", ret);
-		gpiod_set_value_cansleep(ctx->reset_gpio, 1);
-		regulator_disable(ctx->supply);
-		return ret;
-	}
 
 	ctx->prepared = true;
 	return 0;
@@ -250,6 +258,7 @@ static int samsung_s6e3fc2x01_get_modes(struct drm_panel *panel,
 
 static const struct drm_panel_funcs samsung_s6e3fc2x01_panel_funcs = {
 	.prepare = samsung_s6e3fc2x01_prepare,
+	.enable = samsung_s6e3fc2x01_enable,
 	.disable = samsung_s6e3fc2x01_disable,
 	.unprepare = samsung_s6e3fc2x01_unprepare,
 	.get_modes = samsung_s6e3fc2x01_get_modes,

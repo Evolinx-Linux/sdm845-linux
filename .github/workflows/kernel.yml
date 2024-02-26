@@ -1,4 +1,4 @@
-name: BUILD: SDM845 Kernel
+name: BUILD - SDM845 Kernel
 
 on:
     workflow_dispatch:
@@ -27,11 +27,10 @@ jobs:
         make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- modules_prepare
         make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- modules_install INSTALL_MOD_PATH=../modules
         make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- headers_install INSTALL_HDR_PATH=../headers
-        
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
-        path: ~/EVOLINX/evolinx.iso
+        path: artifacts.tar.xz
     - name: Upload release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
@@ -40,4 +39,6 @@ jobs:
         prerelease: true
         title: "Development Build"
         files: |
-          
+          moudles.tar.xz
+          headers.tar.xz
+          kernel.tar.xz

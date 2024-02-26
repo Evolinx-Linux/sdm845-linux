@@ -18,15 +18,29 @@ jobs:
     - name: Build Image and modules headers
       run: |
         git clone https://github.com/Evolinx-Linux/sdm845-linux.git -b evolinx-6.6 src
-        mkdir -p out modules kernel
+        mkdir -p out artifacts/{modules,headers,kernel,dtb}
 
         cd src
 
         make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- evolinx_defconfig
         make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- -j4
+        make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- Image.gz-dtb -j4
         make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- modules_prepare
         make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- modules_install INSTALL_MOD_PATH=../modules
         make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- headers_install INSTALL_HDR_PATH=../headers
+
+        cd ../artifacts
+        cp -rf ../out/arch/arm64/boot/Image* kernel/
+        cp -rf ../out/arch/arm64/boot/dts/* dtb/
+        
+        tar -cJf ../modules.tar.xz modules
+        tar -cJf ../headers.tar.xz headers
+        tar -cJf ../kernel.tar.xz kernel
+        tar -cJf ../dtb.tar.xz dtb
+
+        tar -cJf ../artifacts.tar.xz .
+        cd ..
+        
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
@@ -42,3 +56,4 @@ jobs:
           moudles.tar.xz
           headers.tar.xz
           kernel.tar.xz
+          dtb.tar.xz

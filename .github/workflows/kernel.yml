@@ -24,7 +24,6 @@ jobs:
 
         make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- evolinx_defconfig
         make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- -j4
-        make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- Image.gz-dtb -j4
         make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- modules_prepare
         make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- modules_install INSTALL_MOD_PATH=../modules
         make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- headers_install INSTALL_HDR_PATH=../headers

@@ -477,6 +477,7 @@ static int nt35596s_panel_add(struct nt35596s_panel *pinfo)
 				     "failed to get reset gpio from DT\n");
 
 	drm_panel_init(&pinfo->base, dev, &panel_funcs, DRM_MODE_CONNECTOR_DSI);
+	pinfo->base.prepare_prev_first = true;
 
 	drm_panel_add(&pinfo->base);
 

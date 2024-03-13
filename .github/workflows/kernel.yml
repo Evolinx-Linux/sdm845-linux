@@ -1,0 +1,58 @@
+name: BUILD - SDM845 Kernel
+
+on:
+    workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Install required packages
+      run: |
+        sudo apt update
+        sudo apt install -y build-essential libgmp-dev libmpfr-dev libmpc-dev libisl-dev libncurses5-dev bc git bison flex zstd
+        sudo apt install -y gcc make gcc-arm-linux-gnueabi binutils-arm-linux-gnueabi
+        sudo apt install -y gcc make gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu
+    - name: Build Image and modules headers
+      run: |
+        git clone https://github.com/Evolinx-Linux/sdm845-linux.git -b evolinx-6.6 src
+        mkdir -p out artifacts/{modules,headers,kernel,dtb}
+
+        cd src
+
+        make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- evolinx_defconfig
+        make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- -j4
+        make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- modules_prepare
+        make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- modules_install INSTALL_MOD_PATH=../artifacts/modules
+        make O=../out ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- headers_install INSTALL_HDR_PATH=../artifacts/headers
+
+        cd ../artifacts
+        cp -rf ../out/arch/arm64/boot/Image* kernel/
+        cp -rf ../out/arch/arm64/boot/dts/* dtb/
+        
+        tar -cJf ../modules.tar.xz modules
+        tar -cJf ../headers.tar.xz headers
+        tar -cJf ../kernel.tar.xz kernel
+        tar -cJf ../dtb.tar.xz dtb
+
+        tar -cJf ../artifacts.tar.xz .
+        cd ..
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        path: artifacts.tar.xz
+    - name: Upload release
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Development Build"
+        files: |
+          modules.tar.xz
+          headers.tar.xz
+          kernel.tar.xz
+          dtb.tar.xz

@@ -17,7 +17,7 @@ jobs:
         sudo apt install -y gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu
     - name: Build Image and modules headers
       run: |
-        git clone https://github.com/Evolinx-Linux/sdm845-linux.git -b evolinx-6.6 src
+        git clone https://github.com/Evolinx-Linux/sdm845-linux.git -b evolinx-6.6 src --depth=1
         mkdir -p out artifacts/{modules,headers,kernel,dtb}
 
         cd src

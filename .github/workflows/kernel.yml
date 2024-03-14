@@ -1,4 +1,4 @@
-name: BUILD - SDM845 Kernel
+name: BUILD - SDM845 Kernel - evolinx-6.6.0
 
 on:
     workflow_dispatch:

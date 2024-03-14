@@ -28,16 +28,26 @@ jobs:
         make O=../out CC=clang ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- -j"$(nproc --all)" modules_install INSTALL_MOD_PATH=../artifacts/modules
         make O=../out CC=clang ARCH=arm64 SUBARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- -j"$(nproc --all)" headers_install INSTALL_HDR_PATH=../artifacts/headers
 
+        echo "[ BUILD ]: Kernel compile done"
+
         cd ../artifacts
         cp -rf ../out/arch/arm64/boot/Image* kernel/
         cp -rf ../out/arch/arm64/boot/dts/* dtb/
-        
+
+        echo "[ BUILD ]: compressing modules"
         tar -cJf ../modules.tar.xz modules
+        echo "[ BUILD ]: compressing headers"
         tar -cJf ../headers.tar.xz headers
+        echo "[ BUILD ]: compressing kernel image"
         tar -cJf ../kernel.tar.xz kernel
+        echo "[ BUILD ]: compressing dtb"
         tar -cJf ../dtb.tar.xz dtb
 
+        echo "[ BUILD ]: compressing modules, headers, kernel, dtb for artifacts"
+
         tar -cJf ../artifacts.tar.xz .
+
+        echo "[ BUILD ]: Done"
         cd ..
         
     - name: Upload artifacts
